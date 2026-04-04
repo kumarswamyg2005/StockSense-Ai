@@ -1,0 +1,286 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Sora:wght@400;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+
+  --color-bg: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-text-primary: #1a1d23;
+  --color-text-secondary: #6b7280;
+  --color-accent: #00c851;
+  --color-gain: #00b341;
+  --color-gain-bg: #e6faf0;
+  --color-loss: #ff3b30;
+  --color-loss-bg: #fff0ef;
+  --color-border: #e5e7eb;
+  --color-chart: #4f46e5;
+  --color-ai: #f59e0b;
+  --color-ai-text: #b45309;
+  --color-ai-bg: #fef3c7;
+
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  --radius-sm: 4px;
+  --radius-md: 12px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  --shadow-subtle: 0 4px 20px rgba(26, 29, 35, 0.04);
+  --shadow-card:
+    0 1px 4px rgba(26, 29, 35, 0.06), 0 8px 32px rgba(26, 29, 35, 0.04);
+  --shadow-hover: 0 12px 48px rgba(79, 70, 229, 0.12);
+
+  --chart-grid: #e5e7eb;
+  --chart-axis: #6b7280;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-text: #1a1d23;
+  --chart-tooltip-border: #e5e7eb;
+  --chart-area-fill: #4f46e533;
+  --chart-volume-fill: #6b728055;
+}
+
+html.dark,
+.dark {
+  color-scheme: dark;
+  --color-bg: #0d0f12;
+  --color-surface: #14171c;
+  --color-text-primary: #f7f8fa;
+  --color-text-secondary: #9ca3af;
+  --color-border: #2a2f3a;
+
+  --color-gain-bg: rgba(0, 179, 65, 0.1);
+  --color-loss-bg: rgba(255, 59, 48, 0.1);
+  --color-ai-bg: rgba(245, 158, 11, 0.1);
+  --color-ai-text: #fbbf24;
+
+  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.4), 0 8px 32px rgba(0, 0, 0, 0.3);
+
+  --chart-grid: #2a2f3a;
+  --chart-axis: #9ca3af;
+  --chart-tooltip-bg: #14171c;
+  --chart-tooltip-text: #f7f8fa;
+  --chart-tooltip-border: #2a2f3a;
+  --chart-area-fill: #4f46e544;
+  --chart-volume-fill: #6b728066;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--color-chart);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.display-font {
+  font-family: "Sora", sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.mono-font {
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-subtle);
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card);
+  transform: translateY(-2px);
+}
+
+.card-strong {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-card);
+}
+
+.section-title {
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-lg);
+}
+
+/* Page background texture */
+.page-background {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  overflow: hidden;
+}
+
+.mesh-gradient {
+  position: absolute;
+  top: -10vh;
+  left: -5vw;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(
+    circle,
+    rgba(79, 70, 229, 0.08) 0%,
+    transparent 60%
+  );
+  filter: blur(80px);
+}
+
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Utilities */
+.text-gain {
+  color: var(--color-gain);
+}
+.bg-gain {
+  background-color: var(--color-gain-bg);
+}
+.text-loss {
+  color: var(--color-loss);
+}
+.bg-loss {
+  background-color: var(--color-loss-bg);
+}
+.text-chart {
+  color: var(--color-chart);
+}
+
+.pill-base {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.pill-gain {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background-color: var(--color-gain-bg);
+  color: var(--color-gain);
+  border-radius: var(--radius-full);
+}
+.pill-loss {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background-color: var(--color-loss-bg);
+  color: var(--color-loss);
+  border-radius: var(--radius-sm);
+}
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.875rem;
+  background-color: var(--color-ai-bg);
+  color: var(--color-ai-text);
+  border-radius: 6px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition-property:
+    color, background-color, border-color, fill, stroke, box-shadow;
+  transition-duration: 300ms;
+  transition-timing-function: ease;
+}
+html.theme-transition .recharts-wrapper * {
+  transition: none !important;
+}
+
+/* Base button overrides */
+button {
+  transition: all 0.2s ease;
+}
+button:hover {
+  transform: scale(1.02);
+}
+button:active {
+  transform: scale(0.98);
+}
+
+@keyframes fadeInY {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatA {
+  0%, 100% { transform: rotate(-2deg) translate(-30px, 0); }
+  50% { transform: rotate(-2deg) translate(-30px, -15px); }
+}
+
+@keyframes floatB {
+  0%, 100% { transform: rotate(4deg) translate(80px, 140px); }
+  50% { transform: rotate(4deg) translate(80px, 125px); }
+}
