@@ -24,9 +24,10 @@ const plainMeaning = {
 };
 
 export default function SignalBadge({ signal }) {
-  const tone = styleMap[signal?.signal] || styleMap.HOLD;
-  const Icon = iconMap[signal?.signal] || AlertTriangle;
-  const meaning = plainMeaning[signal?.signal] || plainMeaning.HOLD;
+  const signalValue = signal?.signal;
+  const tone = styleMap[signalValue] || "border-[var(--color-border)] bg-[var(--color-border)]/20 text-[var(--color-text-secondary)]";
+  const Icon = iconMap[signalValue] || ShieldAlert;
+  const meaning = plainMeaning[signalValue] || "Insufficient data to generate a signal. Open for full analysis.";
 
   return (
     <div
@@ -40,12 +41,12 @@ export default function SignalBadge({ signal }) {
             Algorithmic Signal
           </p>
           <h3 className="text-[2.5rem] font-extrabold font-[Sora] leading-none tracking-tight">
-            {signal?.signal || "HOLD"}
+            {signalValue || "N/A"}
           </h3>
           <p className="text-sm font-semibold mono-font mt-2 tracking-tight">
             Conviction Scale:{" "}
             <span className="opacity-100 uppercase tracking-wider text-xs ml-1 bg-none border border-current px-2 py-0.5 rounded-[var(--radius-sm)]">
-              {signal?.strength || "Moderate"}
+              {signal?.strength || "—"}
             </span>
           </p>
           <p className="mt-3 text-[0.8rem] font-medium leading-relaxed opacity-90 border-l-2 border-current pl-3">

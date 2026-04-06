@@ -257,10 +257,9 @@ class StockDataService:
         week_52_low = float(trailing["Low"].min())
 
         ticker = yf.Ticker(symbol)
-        fast_info = getattr(ticker, "fast_info", {})
-        market_cap = self._format_market_cap(fast_info.get("market_cap"))
-
-        currency = fast_info.get("currency") or ("INR" if symbol.endswith(".NS") else "USD")
+        fast_info = getattr(ticker, "fast_info", None)
+        market_cap = self._format_market_cap(getattr(fast_info, "market_cap", None))
+        currency = getattr(fast_info, "currency", None) or ("INR" if symbol.endswith(".NS") else "USD")
 
         details = STOCK_LOOKUP.get(symbol, {"name": symbol, "exchange": "N/A"})
         technicals = {
@@ -391,24 +390,55 @@ class StockDataService:
             return {}
 
         unique_symbols = list(dict.fromkeys(normalized))
-        joined = " ".join(unique_symbols)
 
         def _download_payload() -> list[dict[str, Any]]:
             try:
-                import yfinance as yf
-                tickers = yf.Tickers(joined).tickers
-                data_list = []
-                for sym, t in tickers.items():
-                    try:
-                        info = t.fast_info
+                df = yf.download(
+                    unique_symbols,
+                    period="5d",
+                    interval="1d",
+                    auto_adjust=False,
+                    progress=False,
+                    threads=False,
+                )
+                if df is None or df.empty:
+                    return []
+
+                data_list: list[dict[str, Any]] = []
+
+                if not isinstance(df.columns, pd.MultiIndex):
+                    # Single symbol — simple column names
+                    sym = unique_symbols[0]
+                    close = pd.to_numeric(df.get("Close", pd.Series(dtype=float)), errors="coerce").dropna()
+                    vol = pd.to_numeric(df.get("Volume", pd.Series(dtype=float)), errors="coerce").dropna()
+                    if len(close) >= 2:
                         data_list.append({
                             "symbol": sym,
-                            "price": getattr(info, "last_price", None),
-                            "prev_close": getattr(info, "previous_close", None),
-                            "volume": getattr(info, "last_volume", None),
+                            "price": float(close.iloc[-1]),
+                            "prev_close": float(close.iloc[-2]),
+                            "volume": int(vol.iloc[-1]) if len(vol) > 0 else 0,
                         })
-                    except Exception:
-                        pass
+                else:
+                    # Multiple symbols — MultiIndex columns (field, symbol)
+                    close_df = df["Close"] if "Close" in df else pd.DataFrame()
+                    vol_df = df["Volume"] if "Volume" in df else pd.DataFrame()
+                    for sym in unique_symbols:
+                        try:
+                            if sym not in close_df.columns:
+                                continue
+                            close = pd.to_numeric(close_df[sym], errors="coerce").dropna()
+                            if len(close) < 2:
+                                continue
+                            vol = pd.to_numeric(vol_df[sym], errors="coerce").dropna() if sym in vol_df.columns else pd.Series(dtype=float)
+                            data_list.append({
+                                "symbol": sym,
+                                "price": float(close.iloc[-1]),
+                                "prev_close": float(close.iloc[-2]),
+                                "volume": int(vol.iloc[-1]) if len(vol) > 0 else 0,
+                            })
+                        except Exception:
+                            continue
+
                 return data_list
             except Exception:
                 return []
