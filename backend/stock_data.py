@@ -403,9 +403,9 @@ class StockDataService:
                         info = t.fast_info
                         data_list.append({
                             "symbol": sym,
-                            "price": info.get("lastPrice"),
-                            "prev_close": info.get("previousClose"),
-                            "volume": info.get("lastVolume")
+                            "price": getattr(info, "last_price", None),
+                            "prev_close": getattr(info, "previous_close", None),
+                            "volume": getattr(info, "last_volume", None),
                         })
                     except Exception:
                         pass
